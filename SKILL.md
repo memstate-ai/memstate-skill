@@ -1,10 +1,9 @@
 ---
 name: memstate-ai
 description: >
-  Persistent, versioned memory for AI agents via Memstate AI. Alternative to
-  the Memstate MCP plugin — use for storing facts, recalling memory, managing
-  projects, and semantic search of agent summaries. Supports Markdown ingestion
-  and direct keypath = value assignment. Requires MEMSTATE_API_KEY.
+  Versioned, structured memory for AI agents. 
+  Every fact is tracked, every change is logged, and your agent 
+  always gets the current answer — not a pile of outdated context. Requires MEMSTATE_API_KEY.
 license: MIT
 tags:
   - memory
