@@ -67,19 +67,13 @@ def main():
         expect_key="action", expect_value="created"
     )
 
-    # 2. memstate_set — update the same keypath (should supersede)
-    ok, out = test(
-        "memstate_set: update same keypath (supersede)",
+    # 2. memstate_set — update the same keypath (should auto-version)
+    test(
+        "memstate_set: update same keypath (auto-version)",
         "memstate_set.py",
         ["--project", PROJECT_ID, "--keypath", "database.engine", "--value", "PostgreSQL 16", "--category", "decision"],
         expect_key="version"
     )
-    memory_id = None
-    if ok:
-        try:
-            memory_id = json.loads(out).get("memory_id")
-        except Exception:
-            pass
 
     # 3. memstate_set — store a second fact
     test(
@@ -113,17 +107,13 @@ def main():
         expect_key="memories"
     )
 
-    # 7. memstate_get — by memory_id
-    if memory_id:
-        test(
-            "memstate_get: fetch by memory_id",
-            "memstate_get.py",
-            ["--memory-id", memory_id],
-            expect_key="id", expect_value=memory_id
-        )
-    else:
-        print(f"{SKIP} memstate_get: fetch by memory_id (no memory_id from previous step)")
-        results.append(("memstate_get: fetch by memory_id", None))
+    # 7. memstate_get — subtree with at-revision time-travel
+    test(
+        "memstate_get: time-travel to revision 1",
+        "memstate_get.py",
+        ["--project", PROJECT_ID, "--keypath", "database.engine", "--at-revision", "1"],
+        expect_key="memories"
+    )
 
     # 8. memstate_search — semantic search
     test(

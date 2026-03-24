@@ -1,10 +1,9 @@
 ---
 name: memstate-ai
 description: >
-  Persistent, versioned memory for AI agents via Memstate AI. Alternative to
-  the Memstate MCP plugin — use for storing facts, recalling memory, managing
-  projects, and semantic search of agent summaries. Supports Markdown ingestion
-  and direct keypath = value assignment. Requires MEMSTATE_API_KEY.
+  Versioned, structured memory for AI agents. 
+  Every fact is tracked, every change is logged, and your agent 
+  always gets the current answer — not a pile of outdated context. Requires MEMSTATE_API_KEY.
 license: MIT
 tags:
   - memory
@@ -121,7 +120,7 @@ python3 /home/ubuntu/skills/memstate-ai/scripts/memstate_set.py \
   [--topics TAG1,TAG2]
 ```
 
-**Response keys:** `action` (created|superseded), `memory_id`, `version`
+**Response keys:** `action` (created|updated), `version`, `message`
 
 ---
 
@@ -155,9 +154,6 @@ python3 /home/ubuntu/skills/memstate-ai/scripts/memstate_get.py --project PROJEC
 # Subtree at a keypath
 python3 /home/ubuntu/skills/memstate-ai/scripts/memstate_get.py \
   --project PROJECT_ID --keypath KEYPATH [--include-content] [--at-revision N]
-
-# Single memory by UUID
-python3 /home/ubuntu/skills/memstate-ai/scripts/memstate_get.py --memory-id UUID
 ```
 
 **Response keys (project tree):** `domains`, `total_memories`
@@ -183,14 +179,11 @@ python3 /home/ubuntu/skills/memstate-ai/scripts/memstate_search.py \
 
 ### `memstate_history.py` — Version history
 
-View all versions of a keypath or memory chain.
+View all versions of a keypath. Use version numbers with `--at-revision N` in `memstate_get.py` to time-travel.
 
 ```bash
 python3 /home/ubuntu/skills/memstate-ai/scripts/memstate_history.py \
   --project PROJECT_ID --keypath KEYPATH
-# or
-python3 /home/ubuntu/skills/memstate-ai/scripts/memstate_history.py \
-  --memory-id UUID
 ```
 
 **Response keys:** `versions` (array), `total_versions`

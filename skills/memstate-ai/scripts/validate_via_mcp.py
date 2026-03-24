@@ -85,8 +85,7 @@ def main():
         "value": "PostgreSQL 16",
         "category": "decision"
     })
-    check("memstate_set: supersede (version>=2)", r2, "version")
-    memory_id = (r2 or {}).get("data", {}).get("memory_id")
+    check("memstate_set: auto-version (version>=2)", r2, "version")
 
     # 3. memstate_set — second keypath
     r3 = mcp("memstate_set", {
@@ -116,13 +115,14 @@ def main():
     })
     check("memstate_get: subtree with include_content (memories key)", r6, "memories")
 
-    # 7. memstate_get — by memory_id
-    if memory_id:
-        r7 = mcp("memstate_get", {"memory_id": memory_id})
-        check("memstate_get: fetch by memory_id (id key)", r7, "id", memory_id)
-    else:
-        print(f"\033[93m⚠️  SKIP\033[0m memstate_get: fetch by memory_id (no memory_id)")
-        results.append(("memstate_get: fetch by memory_id", None))
+    # 7. memstate_get — time-travel to revision 1
+    r7 = mcp("memstate_get", {
+        "project_id": PROJECT_ID,
+        "keypath": "database.engine",
+        "at_revision": 1,
+        "include_content": True
+    })
+    check("memstate_get: time-travel at_revision=1 (memories key)", r7, "memories")
 
     # 8. memstate_search — semantic search
     r8 = mcp("memstate_search", {

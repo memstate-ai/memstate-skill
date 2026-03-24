@@ -7,7 +7,6 @@ Usage:
   python3 memstate_get.py --project myapp                   # Full project tree (domains)
   python3 memstate_get.py --project myapp --keypath db      # Subtree at keypath
   python3 memstate_get.py --project myapp --keypath db --include-content
-  python3 memstate_get.py --memory-id <uuid>                # Single memory by ID
   python3 memstate_get.py --project myapp --keypath db --at-revision 3
 """
 import argparse
@@ -16,24 +15,19 @@ import os
 import sys
 import urllib.request
 
-API_KEY = os.environ.get("MEMSTATE_API_KEY", "mst_A94jiQCkQqFRuRtV1qRPL9Jo4vIkOi1r")
+API_KEY = os.environ.get("MEMSTATE_API_KEY", "")
 BASE_URL = "https://api.memstate.ai/api/v1"
 
 HEADERS = {
     "X-API-Key": API_KEY,
     "Content-Type": "application/json",
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    "User-Agent": "memstate-skill/1.0",
 }
 
 
-def get_memories(project_id=None, keypath=None, memory_id=None, include_content=False, at_revision=None):
+def get_memories(project_id=None, keypath=None, include_content=False, at_revision=None):
     try:
-        if memory_id:
-            # GET /memories/{id} — single memory by UUID
-            url = f"{BASE_URL}/memories/{memory_id}"
-            req = urllib.request.Request(url, headers=HEADERS)
-
-        elif project_id and keypath:
+        if project_id and keypath:
             # POST /keypaths — subtree at a specific keypath
             url = f"{BASE_URL}/keypaths"
             data = {
@@ -80,9 +74,8 @@ if __name__ == "__main__":
     )
     parser.add_argument("--project", help="Project ID")
     parser.add_argument("--keypath", help="Subkeypath within project (e.g. 'database' or 'config.port')")
-    parser.add_argument("--memory-id", help="Get a single memory by its UUID")
     parser.add_argument("--include-content", action="store_true", help="Include full memory content in response")
     parser.add_argument("--at-revision", type=int, help="Optional revision number for time-travel queries")
 
     args = parser.parse_args()
-    sys.exit(get_memories(args.project, args.keypath, args.memory_id, args.include_content, args.at_revision))
+    sys.exit(get_memories(args.project, args.keypath, args.include_content, args.at_revision))

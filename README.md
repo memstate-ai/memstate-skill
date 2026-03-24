@@ -82,7 +82,7 @@ python3 scripts/memstate_delete_project.py --project "old-project"
 |---|---|---|
 | `memstate_set.py` | Store one keypath = value | Sync |
 | `memstate_remember.py` | Ingest markdown, AI extracts keypaths | Async (~15s) |
-| `memstate_get.py` | Browse projects, trees, subtrees, single memories | Sync |
+| `memstate_get.py` | Browse projects, trees, subtrees, time-travel by revision | Sync |
 | `memstate_search.py` | Semantic search by meaning | Sync |
 | `memstate_history.py` | View version history | Sync |
 | `memstate_delete.py` | Soft-delete a keypath | Sync |
@@ -93,8 +93,8 @@ python3 scripts/memstate_delete_project.py --project "old-project"
 All 13 test cases pass against the live Memstate API:
 
 ```
-✅ memstate_set: create, supersede, second keypath
-✅ memstate_get: list projects, project tree, subtree, by memory_id
+✅ memstate_set: create, auto-version, second keypath
+✅ memstate_get: list projects, project tree, subtree, time-travel (at_revision)
 ✅ memstate_search: semantic search
 ✅ memstate_history: by keypath
 ✅ memstate_remember: async markdown ingestion

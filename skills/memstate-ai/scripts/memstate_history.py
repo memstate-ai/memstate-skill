@@ -1,33 +1,41 @@
 #!/usr/bin/env python3
+"""
+memstate_history.py — View version history for a keypath.
+
+Usage:
+  python3 memstate_history.py --project myapp --keypath auth.provider
+
+Use the version numbers returned with memstate_get.py --at-revision N to time-travel.
+"""
 import argparse
 import json
 import os
 import sys
 import urllib.request
 
-API_KEY = os.environ.get("MEMSTATE_API_KEY", "mst_A94jiQCkQqFRuRtV1qRPL9Jo4vIkOi1r")
+API_KEY = os.environ.get("MEMSTATE_API_KEY", "")
 BASE_URL = "https://api.memstate.ai/api/v1"
 
-def get_history(project_id=None, keypath=None, memory_id=None):
+
+def get_history(project_id=None, keypath=None):
+    if not project_id or not keypath:
+        print("Error: Both --project and --keypath are required", file=sys.stderr)
+        return 1
+
     url = f"{BASE_URL}/memories/history"
     headers = {
         "X-API-Key": API_KEY,
         "Content-Type": "application/json",
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        "User-Agent": "memstate-skill/1.0",
     }
-    
-    data = {}
-    if memory_id:
-        data["memory_id"] = memory_id
-    elif project_id and keypath:
-        data["project_id"] = project_id
-        data["keypath"] = keypath
-    else:
-        print("Error: Must provide either --memory-id OR both --project and --keypath", file=sys.stderr)
-        return 1
+
+    data = {
+        "project_id": project_id,
+        "keypath": keypath,
+    }
 
     req = urllib.request.Request(url, data=json.dumps(data).encode("utf-8"), headers=headers, method="POST")
-    
+
     try:
         with urllib.request.urlopen(req) as response:
             result = json.loads(response.read().decode("utf-8"))
@@ -40,11 +48,15 @@ def get_history(project_id=None, keypath=None, memory_id=None):
         print(f"Error: {e}", file=sys.stderr)
         return 1
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="View version history for a keypath or memory chain")
-    parser.add_argument("--project", help="Project ID (required with --keypath)")
-    parser.add_argument("--keypath", help="Keypath to get history for")
-    parser.add_argument("--memory-id", help="Memory ID to get history for")
-    
+    parser = argparse.ArgumentParser(
+        description="View version history for a keypath",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__,
+    )
+    parser.add_argument("--project", required=True, help="Project ID")
+    parser.add_argument("--keypath", required=True, help="Keypath to get history for")
+
     args = parser.parse_args()
-    sys.exit(get_history(args.project, args.keypath, args.memory_id))
+    sys.exit(get_history(args.project, args.keypath))
